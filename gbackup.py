@@ -2,7 +2,7 @@
 import os
 import re
 import tarfile
-from constants import LOGGER, IGNORE
+from constants import LOGGER, IGNORE, HOMEDIR
 
 # Reads ignore file and creates regexes to exclude files
 def parse_ignore():
@@ -51,24 +51,35 @@ DIR_REGEX, FILE_REGEX = parse_ignore()
 
 # Filter function for tar.add()
 def exclude(tarinfo):
-    filename = tarinfo.name
-
-    if DIR_REGEX is not None:
+    try:
+        filename = tarinfo.name
         dir_match = re.match(DIR_REGEX, filename)
-
-    if FILE_REGEX is not None:
         file_match = re.match(FILE_REGEX, filename)
 
-    if (dir_match is None) and (file_match is None):
-        return tarinfo
+        if (dir_match is None) and (file_match is None):
+            #LOGGER.info(f"No match.")
+            #LOGGER.info(f"{filename} is not being excluded.")
+            return tarinfo
 
-    return None
+        LOGGER.info("Match")
+        LOGGER.info(f"{filename} is being excluded.")
+        return None
+    except(
+        FileNotFoundError,
+        OSError,
+        re.error,
+        ValueError,
+        TypeError,
+        Exception
+    ) as e:
+        LOGGER.error(e)
+        raise e
 
 
 def main():
     with tarfile.open(name="backup.tar.gz", mode="w:gz") as tar:
-        # TODO: Debug this tar.add() call
-        tar.add("~", filter=exclude)
+        # TODO: Find out why resulting tar file is ending up so large
+        tar.add(HOMEDIR, filter=exclude)
 
 
 if __name__ == "__main__":

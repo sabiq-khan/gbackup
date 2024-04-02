@@ -1,3 +1,4 @@
+import os
 import sys
 import logging
 
@@ -12,3 +13,6 @@ LOGGER.addHandler(handler)
 
 # Name of file that lists other files to be excluded from backup
 IGNORE = ".gbackignore"
+
+# Home directory of current user
+HOMEDIR = f"/home/{os.getlogin()}"
