@@ -11,8 +11,9 @@ formatter = logging.Formatter(
 handler.setFormatter(formatter)
 LOGGER.addHandler(handler)
 
-# Name of file that lists other files to be excluded from backup
-IGNORE = ".gbackignore"
-
 # Home directory of current user
 HOMEDIR = f"/home/{os.getlogin()}"
+# File listing other files to be excluded from backup
+IGNORE = f"{HOMEDIR}/.gbackignore"
+# Directory where backups will be created
+BACKUPDIR = f"{HOMEDIR}/Documents/Backups"
