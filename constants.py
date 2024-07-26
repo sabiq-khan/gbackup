@@ -21,27 +21,30 @@ HOMEDIR_IGNORE: str = f"{HOMEDIR}/.gbackignore"
 BACKUPDIR: str = f"{HOMEDIR}/Documents/Backups"
 
 DEFAULT_ARGS: GBackupArgs = GBackupArgs(
-    src=HOMEDIR,
-    ignore=HOMEDIR_IGNORE,
-    dest=BACKUPDIR
+    src_dir=HOMEDIR,
+    ignore_file=HOMEDIR_IGNORE,
+    dest_dir=BACKUPDIR,
+    key_file=None
 )
 
 HELP_MESSAGE: str = \
 """
-Usage: ./gbackup.py [--src SOURCE_DIRECTORY] [--ignore IGNORE_FILE] [--dest DESTINATION_DIRECTORY] [--help/-h]
+Usage: ./gbackup.py [--src_dir SOURCE_DIRECTORY] [--ignore_file IGNORE_FILE] [--dest_dir DESTINATION_DIRECTORY] [--key_file GPG_KEY_FILE] [--help/-h]
 
 Creates a backup of a specified directory.
 
 Options:
-	--src           String representing the path to the directory being backed up.
+	--src_dir       Path to directory being backed up.
 
-    --ignore        String representing the name of a file containing file/directory names to exclude from backup.
+    --ignore_file   Path to file containing file/directory names to exclude from backup.
 
-	--dest          String representing the path of the directory where the backup will be created.
+	--dest_dir      Path to directory where the backup will be created.
+
+    --key_file      Path to file containing GPG key to encrypt backup, no encryption if not provided.
 
 	--help/-h       Prints this help message.
 
-Examples:
+Example:
     # Backing up home directory
-    ./gbackup --src $HOME --ignore $HOME/.gbackignore --dest $HOME/Documents/Backup
+    ./gbackup --src_dir $HOME --ignore_file $HOME/.gbackignore --dest_dir $HOME/Documents/Backup
 """
