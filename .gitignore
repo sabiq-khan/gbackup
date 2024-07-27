@@ -1,5 +1,10 @@
 client_secret*
+*.apps.googleusercontent.com.json
 .gbackignore
 __pycache__*
 *.tar.gz
 *.gpg
+build*
+dist*
+bin*
+lib*

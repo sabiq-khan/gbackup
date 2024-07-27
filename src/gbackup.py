@@ -160,9 +160,10 @@ class GBackup:
         try:
             args: GBackupArgs = self._read_args(sys.argv[1:])
             backup_path: str = self._create_backup(args)
+            encrypted_backup_path: Optional[str] = None
             if args.key_file is not None:
                 key_file: str = args.key_file
-                encrypted_backup_path: str = self._encrypt_backup(backup_path, key_file)
+                encrypted_backup_path = self._encrypt_backup(backup_path, key_file)
             
             self.logger.info(f"Backup created at '{encrypted_backup_path or backup_path}'.")
 
