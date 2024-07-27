@@ -1,0 +1,49 @@
+name: Build and Release Executable (Multi-OS)
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-and-release:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]  # Adjust OSes if needed
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install PyInstaller
+        run: pip install pyinstaller tk
+
+      - name: Install Tkinter (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt install -y python3-tk
+
+      - name: Build Executable
+        run: |
+          pyinstaller --hidden-import=tkinter --hidden-import=tkinter.filedialog --name=gbackup --onefile main.py
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+        with:
+          tag_name: v1.0.0-${{ runner.os }}  # Use semantic version with OS suffix
+          release_name: gBackup v1.0.0 (${{ runner.os }})
+          body: |
+            This release builds a ${{ runner.os }} executable for gBackup (v1.0.0).
+            You can download it from the Assets section below.
+          draft: false  # Set to true to create a draft release
+
+      - name: Upload Executable as Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+        with:
+          asset_path: dist/gbackup${{ runner.os == 'Windows' && '.exe' || '' }}  # Adjust path if needed
+          asset_name: gbackup${{ runner.os == 'Windows' && '.exe' || '' }}
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_content_type: application/zip
