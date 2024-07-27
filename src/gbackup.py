@@ -7,7 +7,7 @@ import subprocess
 from subprocess import CompletedProcess
 from typing import Dict, List, Optional, Union
 from constants import BACKUP_FILE_EXTENSION, DEFAULT_BACKUP_DIR, HOME_DIR, HELP_MESSAGE, IGNORE_FILE_NAME, USERNAME
-from logging import Logger, StreamHandler, Formatter, INFO
+from logging import Logger
 
 
 @dataclass
@@ -32,26 +32,14 @@ class GBackupArgs():
 
 
 class GBackup:
-    def __init__(self):
-        self.logger: Logger = self._create_logger("gbackup")
+    def __init__(self, logger: Logger):
+        self.logger: Logger = logger
 
-    def _create_logger(self, name: str):
-        logger: Logger = Logger(name)
-        logger.setLevel(INFO)
-        handler: StreamHandler = StreamHandler(sys.stdout)
-        handler.setLevel(INFO)
-        formatter: Formatter = Formatter(
-            "[%(asctime)s][%(name)s][%(levelname)s]: %(message)s")
-        handler.setFormatter(formatter)
-        logger.addHandler(handler)
-
-        return logger
-
-
-    def _read_args(self, args: List[str]) -> GBackupArgs:
+    @classmethod
+    def read_args(cls, args: List[str]) -> GBackupArgs:
         validated_args: GBackupArgs = GBackupArgs()
 
-        self.logger.info("Validating number of arguments...")
+        # Validating number of arguments
         if len(args) == 0:
             return validated_args
         elif (len(args) == 1) and ((args[0] == "--help") or (args[0] == "-h")):
@@ -63,9 +51,8 @@ class GBackup:
                 sys.exit(0)
             err_msg: str = f"Invalid number of arguments: Recieved {len(args)}."
             raise ValueError(f"{err_msg}\n{help()}")
-        self.logger.info("Number of arguments valid!")
 
-        self.logger.info("Validating arguments...")
+        # Validating argument names and values
         while len(args) > 0:
             option: str = args.pop(0).lstrip("--")
             if (option == "--help") or (option == "-h"):
@@ -77,10 +64,8 @@ class GBackup:
             else:
                 err_msg = f"Invalid option: '{option}' is not a valid option."
                 raise ValueError(f"{err_msg}\n{help()}")
-        self.logger.info(f"Arguments valid! Found the following arguments: {validated_args.to_dict()}")
 
         return validated_args
-
 
     def _create_backup(self, args: GBackupArgs) -> str:
         self.logger.info(f"Starting backup of {args.src_dir}...")
@@ -120,7 +105,6 @@ class GBackup:
 
         return backup_path
 
-
     def _encrypt_backup(self, backup_path: str, key_file: str) -> str:
         self.logger.info(f"Current working directory: {os.getcwd()}")
 
@@ -152,18 +136,12 @@ class GBackup:
         encrypted_backup_path: str = f"{backup_path}.gpg"
         return encrypted_backup_path
 
-
-    def __call__(self):
-        try:
-            args: GBackupArgs = self._read_args(sys.argv[1:])
-            backup_path: str = self._create_backup(args)
-            encrypted_backup_path: Optional[str] = None
-            if args.key_file is not None:
-                key_file: str = args.key_file
-                encrypted_backup_path = self._encrypt_backup(backup_path, key_file)
-            
-            self.logger.info(f"Backup created at '{encrypted_backup_path or backup_path}'.")
-
-        except Exception as e:
-            self.logger.error(e)
-            raise e
+    def __call__(self, args: GBackupArgs = GBackupArgs()):
+        self.logger.info(f"Received the following arguments: {args.to_dict()}")
+        backup_path: str = self._create_backup(args)
+        encrypted_backup_path: Optional[str] = None
+        if args.key_file is not None:
+            key_file: str = args.key_file
+            encrypted_backup_path = self._encrypt_backup(backup_path, key_file)
+        
+        self.logger.info(f"Backup created at '{encrypted_backup_path or backup_path}'.")

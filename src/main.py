@@ -1,5 +1,16 @@
 #!/usr/bin/env python3
-from gbackup import GBackup
+import sys
+from gbackup import GBackup, GBackupArgs
+from constants import LOGGER
 
-gbackup: GBackup = GBackup()
-gbackup()
+def main():
+    try:
+        gbackup: GBackup = GBackup(logger=LOGGER)
+        args: GBackupArgs = GBackup.read_args(sys.argv[1:])
+        gbackup(args)
+    except Exception as e:
+        LOGGER.error(e)
+        raise e
+
+if __name__ == "__main__":
+    main()
