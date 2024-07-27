@@ -23,7 +23,7 @@ jobs:
 
       - name: Build Executable
         run: |
-          pyinstaller --hidden-import=tkinter --hidden-import=tkinter.filedialog --name=gbackup --onefile main.py
+          pyinstaller --hidden-import=tkinter --hidden-import=tkinter.filedialog --name=gbackup --onefile src/main.py
 
       - name: Create Release
         id: create_release
