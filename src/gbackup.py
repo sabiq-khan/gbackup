@@ -47,9 +47,6 @@ class GBackup:
 
         return logger
 
-    def _help(self) -> str:
-        return HELP_MESSAGE
-
 
     def _read_args(self, args: List[str]) -> GBackupArgs:
         validated_args: GBackupArgs = GBackupArgs()
