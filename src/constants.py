@@ -2,7 +2,6 @@ import getpass
 import os
 import sys
 from logging import Logger, StreamHandler, Formatter, INFO
-from typing import Dict
 
 LOGGER: Logger = Logger("gbackup")
 LOGGER.setLevel(INFO)
