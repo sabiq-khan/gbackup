@@ -8,3 +8,4 @@ build/
 dist/
 bin/
 lib/
+pyvenv.cfg
